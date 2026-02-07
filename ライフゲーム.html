@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ぷぷくのサイト｜ライフゲーム</title>
+
+  <style>
+    body {
+      background-image: url("https://design-develop.net/wp-content/uploads/2013/01/subtle-light-tile-pattern-vol5.jpg");
+      background-size: cover;
+      background-repeat: repeat;
+      margin: 15px;
+      border-radius: 10px;
+      font-family: serif;
+    }
+
+    h1 {
+      color: white;
+      background-color: #002792;
+      padding: 15px;
+      text-align: center;
+      margin: 0;
+      border-radius: 10px;
+    }
+
+    .container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    canvas {
+      background: white;
+      border: 2px solid black;
+      margin-top: 15px;
+    }
+
+    button, input[type=range] {
+      padding: 8px 15px;
+      font-size: 16px;
+      margin: 8px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+<h1>ぷぷくのサイト｜ライフゲーム</h1>
+
+<center>
+  <a href="index.html"><h3>ホーム</h3></a>
+</center>
+
+<div class="container">
+  <p>クリックで配置 → 開始</p>
+
+  <button onclick="startGame()">▶ 開始</button>
+  <button onclick="stopGame()">⏸ 停止</button>
+  <button onclick="clearGrid()">🔄 リセット</button>
+
+  <br>
+  速度：
+  <input type="range" min="50" max="1000" value="300" id="speedSlider">
+  <span id="speedValue">300</span> ms
+
+  <br>
+  <canvas id="game" width="600" height="600"></canvas>
+</div>
+
+<footer>
+  © 2026 pupuku
+</footer>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const size = 15; 
+const rows = canvas.height / size;
+const cols = canvas.width / size;
+
+let grid = [];
+let timer = null;
+let speed = 300;
+
+const slider = document.getElementById("speedSlider");
+const speedValue = document.getElementById("speedValue");
+
+slider.oninput = function() {
+  speed = this.value;
+  speedValue.textContent = speed;
+  if (timer) {
+    stopGame();
+    startGame();
+  }
+};
+
+// 初期化
+function initGrid() {
+  grid = [];
+  for (let y = 0; y < rows; y++) {
+    grid[y] = [];
+    for (let x = 0; x < cols; x++) {
+      grid[y][x] = 0;
+    }
+  }
+}
+
+initGrid();
+
+// 描画
+function drawGrid() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (grid[y][x] === 1) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(x * size, y * size, size, size);
+      }
+      ctx.strokeRect(x * size, y * size, size, size);
+    }
+  }
+}
+
+// 次世代
+function nextGen() {
+  let newGrid = JSON.parse(JSON.stringify(grid));
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      let neighbors = 0;
+
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          let ny = y + dy;
+          let nx = x + dx;
+
+          if (ny >= 0 && ny < rows && nx >= 0 && nx < cols) {
+            neighbors += grid[ny][nx];
+          }
+        }
+      }
+
+      if (grid[y][x] === 1 && (neighbors < 2 || neighbors > 3)) {
+        newGrid[y][x] = 0;
+      } else if (grid[y][x] === 0 && neighbors === 3) {
+        newGrid[y][x] = 1;
+      }
+    }
+  }
+
+  grid = newGrid;
+  drawGrid();
+}
+
+// クリック配置
+canvas.addEventListener("click", function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / size);
+  const y = Math.floor((e.clientY - rect.top) / size);
+
+  grid[y][x] = grid[y][x] ? 0 : 1;
+  drawGrid();
+});
+
+function startGame() {
+  if (!timer) {
+    timer = setInterval(nextGen, speed);
+  }
+}
+
+function stopGame() {
+  clearInterval(timer);
+  timer = null;
+}
+
+function clearGrid() {
+  stopGame();
+  initGrid();
+  drawGrid();
+}
+
+drawGrid();
+</script>
+
+</body>
+</html>

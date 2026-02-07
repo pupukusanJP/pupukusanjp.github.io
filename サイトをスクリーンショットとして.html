@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+       <title>ぷぷくのサイト｜サイトをスクリーンショットとして表示</title>
+       <style>
+        body {
+            background-image: url("https://design-develop.net/wp-content/uploads/2013/01/subtle-light-tile-pattern-vol5.jpg");
+            background-size: cover;
+            background-repeat: repeat;
+            margin: 15px;
+            border-radius: 10px;
+            font-family: serif;
+        }
+        h1 {
+            color: white;
+            background-color: #002792;
+            padding: 15px;
+            text-align: center;
+            margin: 0;
+             border-radius: 10px;
+        }
+
+        marquee {
+            color: rgb(255, 102, 0);
+            background-color: #181818;
+            padding: 10px;
+            font-size: 20px;
+        }
+
+        footer {
+            text-align: center;
+            color: black;
+            margin-top: 20px;
+        }
+
+        center {
+            text-align: center;
+        }
+
+        .button-area {
+            display: flex;
+            justify-content: center; /* 横中央 */
+            gap: 20px;              /* ボタン同士の間隔 */
+            margin-top: 30px;       /* 上との余白 */
+        }
+
+        .button-area button {
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        p {
+            text-align: center;
+        }
+    </style>
+    </head>
+    <body>
+        <center>
+                  <h1>ぷぷくのサイト｜サイトをスクリーンショットとして表示</h1>
+                <a href="index.html">
+        <h3>ホーム</h3>
+    </a>
+
+
+               <!-- リンク入力フォーム -->
+    <input type="text" id="imageLink" placeholder="ページのリンクを入力">
+    <button onclick="convertLinkToScreenshot()">スクリーンショットを表示</button>
+
+    <!-- 画像表示領域 -->
+    <div id="imageContainer"></div>
+
+    <script>
+        function convertLinkToScreenshot() {
+            const link = document.getElementById('imageLink').value;
+            const imageContainer = document.getElementById('imageContainer');
+            imageContainer.innerHTML = '';
+
+            const apiKey = '2eeec1'; // あなたのAPIキー
+            const apiUrl = `https://api.screenshotmachine.com?key=${apiKey}&url=${encodeURIComponent(link)}&dimension=1024xfull`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('ネットワークエラー: ' + response.status);
+                    }
+                    return response.blob(); // 画像データをblobとして取得
+                })
+                .then(blob => {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    img.alt = 'スクリーンショット';
+                    imageContainer.appendChild(img);
+                })
+                .catch(error => {
+                    imageContainer.innerHTML = 'エラーが発生しました: ' + error.message;
+                    console.error(error);
+                });
+        }
+    </script>
+        </center>
+    <footer>
+        © 2026 pupuku
+    </footer>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c923fd5d955d3f6',t:'MTc3MDI5Mjg0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c92bf996d1bd1bd',t:'MTc3MDI5ODA4MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c92c027af2396b0',t:'MTc3MDI5ODEwMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    
+</html>

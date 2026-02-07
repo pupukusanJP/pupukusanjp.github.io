@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ぷぷくのサイト｜テトリス</title>
+
+<style>
+body {
+  background-image: url("https://design-develop.net/wp-content/uploads/2013/01/subtle-light-tile-pattern-vol5.jpg");
+  background-size: cover;
+  background-repeat: repeat;
+  margin: 15px;
+  border-radius: 10px;
+  font-family: serif;
+}
+
+h1 {
+  color: white;
+  background-color: #002792;
+  padding: 15px;
+  text-align: center;
+  margin: 0;
+  border-radius: 10px;
+}
+
+.container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+canvas {
+  background: black;
+  border: 2px solid white;
+  margin-top: 15px;
+}
+
+button {
+  padding: 12px 18px;
+  font-size: 16px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.controls {
+  margin-top: 10px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  color: black;
+}
+</style>
+</head>
+
+<body>
+<h1>ぷぷくのサイト｜テトリス</h1>
+
+<center>
+<a href="index.html"><h3>ホーム</h3></a>
+</center>
+
+<div class="container">
+<p>← → ↓：移動 / ↑：回転</p>
+
+<button onclick="startGame()">▶ 開始</button>
+<p>スコア：<span id="score">0</span></p>
+
+<canvas id="game" width="300" height="600"></canvas>
+
+<div class="controls">
+  <button onclick="moveLeft()">⬅</button>
+  <button onclick="rotate()">⟳</button>
+  <button onclick="moveRight()">➡</button>
+  <br>
+  <button onclick="drop()">⬇</button>
+</div>
+</div>
+
+<footer>
+© 2026 pupuku
+</footer>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const blockSize = 30;
+const cols = 10;
+const rows = 20;
+
+let board = [];
+let score = 0;
+let gameInterval;
+let currentPiece;
+
+const shapes = [
+ [[1,1,1,1]],
+ [[1,1],[1,1]],
+ [[0,1,0],[1,1,1]],
+ [[1,0,0],[1,1,1]],
+ [[0,0,1],[1,1,1]],
+ [[1,1,0],[0,1,1]],
+ [[0,1,1],[1,1,0]]
+];
+
+function initBoard() {
+ board = [];
+ for (let y=0;y<rows;y++){
+  board[y]=Array(cols).fill(0);
+ }
+}
+
+function newPiece() {
+ const shape = shapes[Math.floor(Math.random()*shapes.length)];
+ currentPiece = {shape: shape, x:3, y:0};
+}
+
+function drawBoard() {
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ for(let y=0;y<rows;y++){
+  for(let x=0;x<cols;x++){
+   if(board[y][x]){
+    ctx.fillStyle="cyan";
+    ctx.fillRect(x*blockSize,y*blockSize,blockSize,blockSize);
+    ctx.strokeRect(x*blockSize,y*blockSize,blockSize,blockSize);
+   }
+  }
+ }
+ drawPiece();
+}
+
+function drawPiece(){
+ ctx.fillStyle="red";
+ currentPiece.shape.forEach((row,y)=>{
+  row.forEach((v,x)=>{
+   if(v){
+    ctx.fillRect((currentPiece.x+x)*blockSize,(currentPiece.y+y)*blockSize,blockSize,blockSize);
+    ctx.strokeRect((currentPiece.x+x)*blockSize,(currentPiece.y+y)*blockSize,blockSize,blockSize);
+   }
+  });
+ });
+}
+
+function collide(dx,dy,shape=currentPiece.shape){
+ for(let y=0;y<shape.length;y++){
+  for(let x=0;x<shape[y].length;x++){
+   if(shape[y][x]){
+    let nx=currentPiece.x+x+dx;
+    let ny=currentPiece.y+y+dy;
+    if(nx<0||nx>=cols||ny>=rows) return true;
+    if(board[ny]&&board[ny][nx]) return true;
+   }
+  }
+ }
+ return false;
+}
+
+function merge(){
+ currentPiece.shape.forEach((row,y)=>{
+  row.forEach((v,x)=>{
+   if(v) board[currentPiece.y+y][currentPiece.x+x]=1;
+  });
+ });
+}
+
+function rotate(){
+ const rotated = currentPiece.shape[0].map((_,i)=>
+  currentPiece.shape.map(r=>r[i]).reverse()
+ );
+ if(!collide(0,0,rotated)) currentPiece.shape=rotated;
+ drawBoard();
+}
+
+function clearLines(){
+ for(let y=rows-1;y>=0;y--){
+  if(board[y].every(c=>c===1)){
+   board.splice(y,1);
+   board.unshift(Array(cols).fill(0));
+   score+=100;
+   document.getElementById("score").textContent=score;
+  }
+ }
+}
+
+function drop(){
+ if(!collide(0,1)){
+  currentPiece.y++;
+ }else{
+  merge();
+  clearLines();
+  newPiece();
+  if(collide(0,0)){
+   clearInterval(gameInterval);
+   alert("ゲームオーバー");
+  }
+ }
+ drawBoard();
+}
+
+function moveLeft(){
+ if(!collide(-1,0)){currentPiece.x--; drawBoard();}
+}
+function moveRight(){
+ if(!collide(1,0)){currentPiece.x++; drawBoard();}
+}
+
+// キーボード対応
+document.addEventListener("keydown", e => {
+  if (!currentPiece) return;
+
+  const key = e.key.toLowerCase();
+
+  if (key === "arrowleft" || key === "a") moveLeft();
+  if (key === "arrowright" || key === "d") moveRight();
+  if (key === "arrowdown" || key === "s") drop();
+  if (key === "arrowup" || key === "w") rotate();
+});
+
+function startGame(){
+ score=0;
+ document.getElementById("score").textContent=score;
+ initBoard();
+ newPiece();
+ drawBoard();
+ clearInterval(gameInterval);
+ gameInterval=setInterval(drop,500);
+}
+</script>
+</body>
+</html>

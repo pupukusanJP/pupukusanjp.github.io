@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ぷぷくのサイト｜TikTok動画表示</title>
+
+  <style>
+    body {
+      background-image: url("https://design-develop.net/wp-content/uploads/2013/01/subtle-light-tile-pattern-vol5.jpg");
+      background-size: cover;
+      background-repeat: repeat;
+      margin: 15px;
+      border-radius: 10px;
+      font-family: serif;
+    }
+
+    h1 {
+      color: white;
+      background-color: #002792;
+      padding: 15px;
+      text-align: center;
+      margin: 0;
+      border-radius: 10px;
+    }
+
+    .container {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .input-area {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      width: 320px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    #player {
+      margin-top: 15px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>ぷぷくのサイト｜TikTok動画表示</h1>
+
+<center>
+  <a href="index.html"><h3>ホーム</h3></a>
+</center>
+
+<div class="container">
+
+  <div class="input-area">
+    <input type="text" id="video-url" placeholder="TikTokのリンクを入力">
+    <button onclick="loadVideo()">動画を表示</button>
+  </div>
+
+  <div id="player"></div>
+
+</div>
+
+<footer>
+  © 2026 pupuku
+</footer>
+
+<script>
+  // TikTok動画ID抽出
+  function extractVideoId(url) {
+    const regExp = /tiktok\.com\/.*\/video\/(\d+)/;
+    const match = url.match(regExp);
+    return match ? match[1] : null;
+  }
+
+  function loadVideo() {
+    const url = document.getElementById("video-url").value.trim();
+    const videoId = extractVideoId(url);
+
+    if (!videoId) {
+      alert("正しいTikTokリンクを入力してください");
+      return;
+    }
+
+    const iframe = `
+      <iframe width="325" height="580"
+        src="https://www.tiktok.com/embed/v2/${videoId}"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    `;
+
+    document.getElementById("player").innerHTML = iframe;
+  }
+</script>
+
+</body>
+</html>
